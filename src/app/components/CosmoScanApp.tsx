@@ -1,14 +1,14 @@
 "use client";
-
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 
 /**
- * CosmoScan — Single‑file React app (UI v2)
+ * CosmoScan — Single‑file React app (UI v2.1)
  *
- * Alterações visuais
- * - Estilo mais arredondado (rounded-3xl) e sombras suaves
- * - Paleta em roxo/rosa (violet/pink)
- * - Realce com gradientes rosas/roxos e foco acessível
+ * Correções para build/ESLint (Next.js):
+ * - Escapado de aspas em JSX (react/no-unescaped-entities)
+ * - Substituição de `let` por `const` no filtro (prefer-const)
+ * - Inclusão de "solvent" no tipo IngredientRole (remove `any` no mock)
+ * - Diretiva "use client" no topo do arquivo
  */
 
 export default function CosmoScanApp() {
@@ -37,7 +37,7 @@ export default function CosmoScanApp() {
     const q = debouncedQuery.trim().toLowerCase();
     const cat = category.toLowerCase();
 
-    let list = products.filter((p) => {
+    const list = products.filter((p) => {
       const matchesText =
         !q ||
         p.name.toLowerCase().includes(q) ||
@@ -50,6 +50,7 @@ export default function CosmoScanApp() {
       return matchesText && matchesCat && matchesRating;
     });
 
+    // ordena por nota média desc
     list.sort((a, b) => averageRating(b.reviews) - averageRating(a.reviews));
     return list;
   }, [products, debouncedQuery, category, minRating]);
@@ -390,13 +391,13 @@ function EmptyState({ query }: { query: string }) {
     <div className="rounded-3xl border border-dashed border-violet-300 p-10 text-center bg-white/90">
       <p className="text-sm text-violet-800">
         {query ? (
-          <>Não encontramos resultados para "<strong>{query}</strong>".</>
+          <>Não encontramos resultados para &quot;<strong>{query}</strong>&quot;.</>
         ) : (
           <>Use a busca acima para encontrar um cosmético.</>
         )}
       </p>
       <div className="mt-3 text-xs text-violet-600">
-        Sugestões: "hidratante", "ácido hialurônico", "protetor solar".
+        Sugestões: &quot;hidratante&quot;, &quot;ácido hialurônico&quot;, &quot;protetor solar&quot;.
       </div>
     </div>
   );
@@ -413,7 +414,8 @@ type IngredientRole =
   | "humectant"
   | "emollient"
   | "surfactant"
-  | "exfoliant";
+  | "exfoliant"
+  | "solvent"; // adicionado
 
 type Ingredient = {
   name: string;
@@ -457,6 +459,7 @@ function roleLabel(role: IngredientRole) {
     emollient: "Emoliente",
     surfactant: "Tensoativo",
     exfoliant: "Esfoliante",
+    solvent: "Solvente",
   };
   return (map[role] as string) ?? role;
 }
@@ -474,7 +477,7 @@ const MOCK_PRODUCTS: Product[] = [
     brand: "CosmoLab",
     category: "hidratante",
     inci: [
-      { name: "Aqua", role: "solvent" as any },
+      { name: "Aqua", role: "solvent" },
       { name: "Glycerin", role: "humectant", active: true },
       { name: "Sodium Hyaluronate (Hyaluronic Acid)", role: "humectant", active: true },
       { name: "Caprylic/Capric Triglyceride", role: "emollient" },
@@ -495,7 +498,7 @@ const MOCK_PRODUCTS: Product[] = [
     brand: "Solaris",
     category: "protetor solar",
     inci: [
-      { name: "Aqua", role: "solvent" as any },
+      { name: "Aqua", role: "solvent" },
       { name: "Homosalate", role: "sunscreen", active: true, controversial: ["filtro químico"] },
       { name: "Octocrylene", role: "sunscreen", active: true, controversial: ["filtro químico"] },
       { name: "Butyl Methoxydibenzoylmethane (Avobenzone)", role: "sunscreen", active: true },
@@ -516,7 +519,7 @@ const MOCK_PRODUCTS: Product[] = [
     brand: "PureSkin",
     category: "limpeza",
     inci: [
-      { name: "Aqua", role: "solvent" as any },
+      { name: "Aqua", role: "solvent" },
       { name: "Cocamidopropyl Betaine", role: "surfactant" },
       { name: "Sodium Laureth Sulfate", role: "surfactant", controversial: ["SLES"] },
       { name: "Aloe Barbadensis Leaf Juice", role: "moisturizer", active: true },
@@ -536,7 +539,7 @@ const MOCK_PRODUCTS: Product[] = [
     brand: "Reviva",
     category: "anti-idade",
     inci: [
-      { name: "Aqua", role: "solvent" as any },
+      { name: "Aqua", role: "solvent" },
       { name: "Retinol", role: "antioxidant", active: true, controversial: ["fotossensível"] },
       { name: "Niacinamide", role: "antioxidant", active: true },
       { name: "Squalane", role: "emollient" },
@@ -556,7 +559,7 @@ const MOCK_PRODUCTS: Product[] = [
     brand: "Dermasoft",
     category: "hidratante",
     inci: [
-      { name: "Aqua", role: "solvent" as any },
+      { name: "Aqua", role: "solvent" },
       { name: "Ceramide NP", role: "moisturizer", active: true },
       { name: "Shea Butter (Butyrospermum Parkii)", role: "emollient" },
       { name: "Allantoin", role: "moisturizer" },
@@ -576,7 +579,7 @@ const MOCK_PRODUCTS: Product[] = [
     brand: "SkinTune",
     category: "tratamento",
     inci: [
-      { name: "Aqua", role: "solvent" as any },
+      { name: "Aqua", role: "solvent" },
       { name: "Glycolic Acid", role: "exfoliant", active: true, controversial: ["ácido AHA"] },
       { name: "Propylene Glycol", role: "humectant" },
       { name: "Panthenol", role: "moisturizer" },
