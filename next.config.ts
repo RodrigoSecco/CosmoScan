@@ -7,6 +7,7 @@ const repo = "CosmoScan";
 const nextConfig: NextConfig = {
   output: "export",              
   images: { unoptimized: true }, 
+  basePath: isProd ? `/${repo}` : undefined,
   assetPrefix: isProd ? `/${repo}/` : undefined,
   trailingSlash: true,           
 };
